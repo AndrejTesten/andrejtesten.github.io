@@ -29,7 +29,7 @@
   a{color:inherit;text-decoration:none}
 
   /* ---------- floating starfield ---------- */
-  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+  #stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
   /* ---------- nav ---------- */
   nav{
@@ -63,6 +63,19 @@
   /* ---------- hero ---------- */
   .hero{min-height:100vh;display:flex;align-items:center;padding-top:120px}
   .hero-inner{max-width:720px}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center;width:100%}
+  @media(max-width:820px){.hero-grid{grid-template-columns:1fr;gap:34px}.hero-photo{order:-1;justify-self:center}}
+  .hero-photo{position:relative;justify-self:center}
+  .hero-photo img{width:min(340px,72vw);aspect-ratio:4/5;object-fit:cover;border-radius:24px;
+    border:1px solid var(--card-br);box-shadow:0 30px 70px rgba(0,0,0,.55);animation:floatY 6s ease-in-out infinite}
+  .hero-photo::after{content:'';position:absolute;inset:-18px;z-index:-1;border-radius:34px;
+    background:radial-gradient(closest-side,rgba(196,123,255,.34),rgba(110,168,255,.14),transparent);filter:blur(26px)}
+  .photo-fallback{display:none}
+  .hero-photo.noimg{width:min(340px,72vw);aspect-ratio:4/5;border-radius:24px;border:1px dashed var(--card-br);
+    background:var(--card);display:grid;place-items:center;text-align:center;animation:floatY 6s ease-in-out infinite}
+  .hero-photo.noimg .photo-fallback{display:block;font-size:2.6rem;color:var(--muted);line-height:1.5}
+  .hero-photo.noimg .photo-fallback small{font-size:.8rem}
+  @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
   .hi{color:var(--accent);font-weight:600;letter-spacing:1px;margin-bottom:8px}
   .hero h1{font-size:clamp(2.6rem,8vw,5rem);line-height:1.02;margin:0 0 18px;font-weight:900;letter-spacing:-1px}
   .hero h1 .grad{background:linear-gradient(100deg,var(--accent),var(--accent2) 55%,var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -81,9 +94,9 @@
   #globe-holder{position:relative;width:100%;aspect-ratio:1/1;max-width:520px;margin:0 auto;cursor:grab}
   #globe-holder:active{cursor:grabbing}
   /* radial mask fades the canvas edges so the globe never shows a hard square, at any zoom */
-  #globe-canvas{display:block;background:transparent;
-    -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 60%,transparent 76%);
-    mask-image:radial-gradient(circle at 50% 50%,#000 60%,transparent 76%)}
+  #globe-canvas{display:block;width:100%;height:100%;background:transparent;
+    -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 82%,transparent 100%);
+    mask-image:radial-gradient(circle at 50% 50%,#000 82%,transparent 100%)}
   .timeline{position:relative;padding-left:30px}
   .timeline::before{content:'';position:absolute;left:9px;top:10px;bottom:10px;width:2px;background:linear-gradient(var(--accent),var(--accent2))}
   .tl-item{position:relative;margin-bottom:20px;cursor:pointer;transition:transform .18s}
@@ -96,6 +109,18 @@
   .tl-title{font-weight:700;font-size:1.1rem;margin:2px 0 3px}
   .tl-desc{font-size:.9rem;color:var(--muted);line-height:1.55;max-height:0;overflow:hidden;opacity:0;transition:.34s}
   .tl-item.active .tl-desc{max-height:150px;opacity:1;margin-top:6px}
+  /* buffering "next chapter" node */
+  .tl-future{cursor:default;opacity:.85}
+  .tl-future:hover{transform:none}
+  .tl-future::before{background:transparent;border-style:dashed;border-color:var(--muted);
+    box-shadow:none;animation:spin 1.6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tl-future .tl-desc{max-height:80px;opacity:.8;margin-top:6px}
+  .tl-future .tl-title{color:var(--muted)}
+  .dots i{opacity:.2;animation:blink 1.4s infinite}
+  .dots i:nth-child(2){animation-delay:.2s}
+  .dots i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
   /* ---------- generic cards ---------- */
   .grid{display:grid;gap:18px}
@@ -140,6 +165,65 @@
   .hobby b{font-size:.98rem}
   .hobby p{margin:6px 0 0;font-size:.8rem;color:var(--muted)}
 
+  /* ---------- projects ---------- */
+  .project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:26px;perspective:1200px}
+  .project-card{position:relative;border-radius:16px;overflow:hidden;cursor:pointer;
+    background:var(--card);border:1px solid var(--card-br);transform-style:preserve-3d;
+    transition:box-shadow .3s,border-color .3s;will-change:transform}
+  .project-card:hover{border-color:var(--accent);box-shadow:0 26px 60px rgba(0,0,0,.5),0 0 0 1px rgba(110,168,255,.25)}
+  /* fake browser chrome */
+  .pc-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;background:rgba(10,14,30,.8);border-bottom:1px solid var(--card-br)}
+  .pc-bar i{width:11px;height:11px;border-radius:50%;display:block}
+  .pc-bar i:nth-child(1){background:#ff5f57}.pc-bar i:nth-child(2){background:#febc2e}.pc-bar i:nth-child(3){background:#28c840}
+  .pc-url{margin-left:10px;flex:1;font-size:.74rem;color:var(--muted);background:rgba(255,255,255,.05);
+    border-radius:20px;padding:5px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* screenshot */
+  .pc-shot{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0a0f22}
+  .pc-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+  .project-card:hover .pc-shot img{transform:scale(1.06)}
+  .pc-shot.noimg{display:grid;place-items:center;background:
+    linear-gradient(135deg,rgba(110,168,255,.18),rgba(196,123,255,.16))}
+  .pc-shot.noimg img{display:none}
+  .pc-ph{display:none;font-size:2.6rem;text-align:center;color:#fff;opacity:.85}
+  .pc-shot.noimg .pc-ph{display:block}
+  .pc-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;
+    background:rgba(6,9,20,.55);color:#fff;font-weight:700;opacity:0;transition:opacity .3s;backdrop-filter:blur(2px)}
+  .project-card:hover .pc-overlay{opacity:1}
+  .pc-count{position:absolute;top:10px;right:10px;font-size:.72rem;background:rgba(6,9,20,.7);
+    border:1px solid var(--card-br);color:var(--ink);padding:3px 9px;border-radius:20px}
+  /* body */
+  .pc-body{padding:18px 20px 22px}
+  .pc-body h3{margin:0 0 4px;font-size:1.12rem}
+  .pc-tag{color:var(--accent3);font-size:.76rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  .pc-body p{margin:10px 0 14px;font-size:.9rem;color:var(--muted);line-height:1.55}
+  .pc-tech{display:flex;flex-wrap:wrap;gap:7px}
+  .pc-tech span{font-size:.74rem;color:var(--muted);background:rgba(255,255,255,.05);
+    border:1px solid var(--card-br);border-radius:20px;padding:4px 10px}
+  .project-card.ghost{cursor:default;border-style:dashed;opacity:.75}
+  .project-card.ghost:hover{transform:none!important;box-shadow:none;border-color:var(--card-br)}
+  .project-card.ghost .pc-shot{aspect-ratio:16/7}
+  /* lightbox */
+  .lightbox{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:24px;
+    background:rgba(4,6,14,.86);backdrop-filter:blur(8px)}
+  .lightbox.open{display:grid}
+  .lb-inner{width:min(920px,94vw);max-height:92vh;display:flex;flex-direction:column;gap:14px}
+  .lb-stage{position:relative;background:#0a0f22;border:1px solid var(--card-br);border-radius:16px;
+    overflow:hidden;aspect-ratio:16/10;display:grid;place-items:center}
+  .lb-stage img{width:100%;height:100%;object-fit:contain;background:#0a0f22}
+  .lb-stage .pc-ph{display:block;font-size:3rem}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;
+    border:1px solid var(--card-br);background:rgba(6,9,20,.7);color:#fff;font-size:1.3rem;cursor:pointer;transition:.2s}
+  .lb-nav:hover{background:var(--accent);color:#08091a}
+  .lb-prev{left:12px}.lb-next{right:12px}
+  .lb-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .lb-meta h3{margin:0;font-size:1.2rem}
+  .lb-meta .pc-tag{display:block}
+  .lb-links{display:flex;gap:10px}
+  .lb-close{position:fixed;top:18px;right:22px;font-size:1.8rem;color:#fff;cursor:pointer;background:none;border:0;line-height:1}
+  .lb-dots{display:flex;gap:6px;justify-content:center}
+  .lb-dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer}
+  .lb-dots i.on{background:var(--accent2)}
+
   /* blog cta */
   .blog-cta{text-align:center;background:linear-gradient(135deg,rgba(110,168,255,.12),rgba(196,123,255,.10));
     border:1px solid var(--card-br);border-radius:24px;padding:60px 24px}
@@ -149,6 +233,30 @@
   footer{position:relative;z-index:2;text-align:center;padding:40px 20px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--card-br)}
   footer a{color:var(--accent)}
 
+  /* ---------- mobile ---------- */
+  @media(max-width:640px){
+    section{padding:74px 18px}
+    h2.title{font-size:1.65rem}
+    .sub{margin-bottom:30px}
+    .hero{padding-top:96px;min-height:auto}
+    .hero h1{font-size:clamp(2.1rem,11vw,3.2rem)}
+    .hero p{font-size:1.05rem}
+    .hero-grid{gap:26px}
+    .journey-wrap{gap:22px}
+    #globe-holder{max-width:min(400px,84vw)}
+    .timeline{padding-left:26px}
+    .project-grid{gap:16px}
+    .pc-body{padding:16px 16px 18px}
+    .interests{gap:12px}
+    .hobby{flex:1 1 130px;min-width:130px;padding:20px 12px}
+    .lb-inner{width:96vw}
+    .lb-nav{width:40px;height:40px}
+  }
+  @media(max-width:400px){
+    .hero h1{font-size:2rem}
+    .btn{padding:12px 20px;font-size:.9rem}
+  }
+
   .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
   .reveal.in{opacity:1;transform:none}
 </style>
@@ -157,11 +265,12 @@
 <canvas id="stars"></canvas>
 
 <nav>
-  <a class="brand" href="#top">✦ <span>Andrej Testen</span></a>
+  <a class="brand" href="#top"> <span>Andrej Testen</span></a>
   <button class="burger" aria-label="menu">☰</button>
   <div class="navlinks">
     <a href="#journey">Journey</a>
     <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
     <a href="#certs">Certificates</a>
     <a href="#interests">Interests</a>
     <a class="blog" href="#" target="_blank" rel="noopener">Blog ↗</a>
@@ -170,13 +279,21 @@
 
 <!-- ================= HERO ================= -->
 <section class="hero" id="top">
-  <div class="hero-inner reveal">
-    <div class="hi">👋 Hi, I'm</div>
-    <h1><span class="grad">Andrej Testen</span></h1>
-    <p>SOFTWARE ENGINEER - crafting secure fintech solutions and scalable web applications. Born in Belgrade, now creating things in Ljubljana.</p>
-    <div class="cta">
-      <a class="btn primary" href="#journey">Explore my journey 🌍</a>
-      <a class="btn ghost" href="#" target="_blank" rel="noopener" data-blog>Read my blog ↗</a>
+  <div class="hero-grid">
+    <div class="hero-inner reveal">
+      <div class="hi"> Hi, I'm</div>
+      <h1><span class="grad">Andrej Testen</span></h1>
+      <p>SOFTWARE ENGINEER - crafting secure fintech solutions and scalable web applications. Born in Belgrade, now creating things in Ljubljana.</p>
+      <div class="cta">
+        <a class="btn primary" href="#journey">Explore my journey 🌍</a>
+        <a class="btn ghost" href="#" target="_blank" rel="noopener" data-blog>Read my blog ↗</a>
+      </div>
+    </div>
+    <div class="hero-photo reveal">
+      <!-- Put a photo named me.jpg next to index.html (or change the src below). -->
+      <img id="me-photo" src="me.jpg" alt="Andrej Testen"
+           onerror="this.closest('.hero-photo').classList.add('noimg');this.style.display='none'">
+      <span class="photo-fallback">📷<br><small>add <b>me.jpg</b> here</small></span>
     </div>
   </div>
   <div class="scroll-hint">SCROLL ↓</div>
@@ -186,8 +303,8 @@
 <section id="journey">
   <div class="reveal">
     <div class="eyebrow">My path across the map</div>
-    <h2 class="title">The Journey 🌍</h2>
-    <p class="sub">Click a chapter and watch me travel — and grow up — from Belgrade to Slovenia. Drag the globe to look around, scroll to zoom.</p>
+    <h2 class="title">The Journey </h2>
+    <p class="sub">Choose a chapter on the timeline to follow my journey across the globe. Drag to rotate, and scroll to zoom.</p>
   </div>
   <div class="journey-wrap">
     <div id="globe-holder" class="reveal"><canvas id="globe-canvas"></canvas></div>
@@ -199,7 +316,7 @@
 <section id="skills">
   <div class="reveal">
     <div class="eyebrow">What I bring</div>
-    <h2 class="title">Skills 🧠</h2>
+    <h2 class="title">Skills </h2>
     <p class="sub">The technical toolbox and the human side — both matter.</p>
   </div>
   <div class="grid cards-2">
@@ -214,11 +331,21 @@
   </div>
 </section>
 
+<!-- ================= PROJECTS ================= -->
+<section id="projects">
+  <div class="reveal">
+    <div class="eyebrow">Things I've built</div>
+    <h2 class="title">Projects </h2>
+    <p class="sub">Hover a window to peek inside, click to open a live preview of the screenshots.</p>
+  </div>
+  <div class="project-grid" id="projectGrid"></div>
+</section>
+
 <!-- ================= CERTIFICATES ================= -->
 <section id="certs">
   <div class="reveal">
     <div class="eyebrow">Proof of the grind</div>
-    <h2 class="title">Certificates 📜</h2>
+    <h2 class="title">Certificates </h2>
     <p class="sub">Courses and credentials I've earned along the way.</p>
   </div>
   <div class="grid cards-3" id="certlist"></div>
@@ -228,7 +355,7 @@
 <section id="interests">
   <div class="reveal">
     <div class="eyebrow">Off the clock</div>
-    <h2 class="title">Interests & Hobbies 🎯</h2>
+    <h2 class="title">Interests & Hobbies </h2>
     <p class="sub">What keeps me curious and recharged.</p>
   </div>
   <div class="interests" id="hobbylist"></div>
@@ -237,14 +364,14 @@
 <!-- ================= BLOG CTA ================= -->
 <section id="blog">
   <div class="blog-cta reveal">
-    <h2>I write things too ✍️</h2>
+    <h2>I write things too </h2>
     <p>Thoughts on tech, learning, and the journey from Belgrade to Ljubljana. Come say hi on my blog.</p>
     <a class="btn primary" href="#" target="_blank" rel="noopener" data-blog>Visit my blog ↗</a>
   </div>
 </section>
 
 <footer>
-  Built with ❤️ and Three.js · © <span id="year"></span> YOUR NAME · <a href="#" data-blog target="_blank" rel="noopener">Blog</a>
+  Built with Three.js · © <span id="year"></span> Andrej Testen · <a href="#" data-blog target="_blank" rel="noopener">Blog</a>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -256,14 +383,14 @@ const BLOG_URL = "#"; // <-- put your blog link here
 
 // Each stop is a chapter of the journey. Click one and the little avatar travels there — and grows up.
 const STOPS = [
-  { emoji:"🧒", year:"Born & Raised", title:"Belgrade", place:"Serbia 🇷🇸",
-    desc:"Just a Belgrade kid — born, raised, and finished high school here.",
+  { year:"Born & Raised", title:"Belgrade", place:"Serbia",
+    desc:"Born and raised in Belgrade, where I also finished high school.",
     lat:44.7866, lon:20.4489 },
-  { emoji:"🤓", year:"Bachelor's Degree", title:"Novo Mesto", place:"Slovenia 🇸🇮",
-    desc:"Moved to Novo Mesto and turned into a full-blown nerd earning my bachelor's degree.",
+  {  year:"University · Bachelor's", title:"Novo Mesto", place:"Slovenia",
+    desc:"Moved to Novo Mesto for university and earned my bachelor's degree.",
     lat:45.8010, lon:15.1710 },
-  { emoji:"👨‍💼", year:"Now — Work", title:"Ljubljana", place:"Slovenia 🇸🇮",
-    desc:"Leveled up into a working professional in Ljubljana, building things I'm proud of.",
+  {  year:"June 2024 — Present", title:"Ljubljana", place:"Slovenia",
+    desc:"Working at Globus Marine International in Ljubljana since June 2024 — present.",
     lat:46.0569, lon:14.5058 },
 ];
 
@@ -333,6 +460,27 @@ const HOBBIES = [
   },
 ];
 
+// PROJECTS — add your own. `shots` are screenshot paths (e.g. "projects/app-1.jpg");
+// missing images fall back to a placeholder, so you can fill them in anytime.
+const PROJECTS = [
+  { title:"Payment Ledger Platform", tag:"Fintech · Backend", domain:"ledger.internal",
+    desc:"A production-grade double-entry ledger and payment-processing platform engineered for financial accuracy, full auditability, and reliable high-volume transaction handling.",
+    tech:["Double-Entry","Payments","Fintech"], url:"#", ph:"💳",
+    shots:["projects/ledger-1.jpg","projects/ledger-2.jpg","projects/ledger-3.jpg"] },
+  { title:"Hospital Management System", tag:"Full-Stack · Healthcare", domain:"hospital.app",
+    desc:"An end-to-end hospital management system with three dedicated modules — Doctor, Patient, and Admin — built from scratch as my final bachelor's degree project.",
+    tech:["C#",".NET Core","ABP Framework","Angular","MySQL"], url:"#", ph:"🏥",
+    shots:["projects/hospital-1.jpg","projects/hospital-2.jpg","projects/hospital-3.jpg"] },
+  { title:"Couplify", tag:"Mobile · Social", domain:"couplify.app",
+    desc:"A cross-platform mobile app that helps couples stay close and share meaningful moments together, even when they're far apart.",
+    tech:["React Native","Expo","Supabase"], url:"#", ph:"💞",
+    shots:["projects/couplify-1.jpg","projects/couplify-2.jpg"] },
+  { title:"PaperMotion", tag:"AI · Creative", domain:"papermotion.app",
+    desc:"Turns your photos and a prompt into a short AI-generated clip, then lays it out as a printable PDF you fold into a flipbook — the frames animate as you riffle the pages.",
+    tech:["Next.js","AI Video","PDF"], url:"#", ph:"🎞️",
+    shots:["projects/papermotion-1.jpg","projects/papermotion-2.jpg"] },
+];
+
 /* =========================================================
    1. RENDER CONTENT
    ========================================================= */
@@ -343,13 +491,21 @@ const tl=document.getElementById('timeline');
 STOPS.forEach((s,i)=>{
   const d=document.createElement('div');
   d.className='tl-item'+(i===0?' active':''); d.dataset.i=i;
-  d.innerHTML=`<div class="tl-emoji">${s.emoji}</div>
+  d.innerHTML=`
     <div class="tl-year">${s.year}</div>
     <div class="tl-title">${s.title} · ${s.place}</div>
     <div class="tl-desc">${s.desc}</div>`;
   d.addEventListener('click',()=>selectStep(i));
   tl.appendChild(d);
 });
+// buffering "next chapter" node (a teaser for what's coming)
+const future=document.createElement('div');
+future.className='tl-item tl-future';
+future.innerHTML=`
+  <div class="tl-year">Next chapter</div>
+  <div class="tl-title">Loading<span class="dots"><i>.</i><i>.</i><i>.</i></span></div>
+  <div class="tl-desc">Buffering the future — new adventures ahead.</div>`;
+tl.appendChild(future);
 
 const hs=document.getElementById('hardskills');
 HARD_SKILLS.forEach(s=>{
@@ -376,6 +532,101 @@ HOBBIES.forEach(h=>{
   el.innerHTML=`<span class="emo">${h.emo}</span><b>${h.name}</b><p>${h.note}</p>`;
   hl.appendChild(el);
 });
+
+/* =========================================================
+   1b. PROJECTS — cards, 3D tilt, screenshot lightbox
+   ========================================================= */
+(function(){
+  const grid=document.getElementById('projectGrid');
+  if(!grid) return;
+
+  // build the lightbox once
+  const lb=document.createElement('div');
+  lb.className='lightbox';
+  lb.innerHTML=`<button class="lb-close" aria-label="close">✕</button>
+    <div class="lb-inner">
+      <div class="lb-stage">
+        <span class="pc-ph"></span><img alt="screenshot">
+        <button class="lb-nav lb-prev" aria-label="previous">‹</button>
+        <button class="lb-nav lb-next" aria-label="next">›</button>
+      </div>
+      <div class="lb-dots"></div>
+      <div class="lb-meta">
+        <div><span class="pc-tag"></span><h3></h3></div>
+        <div class="lb-links"><a class="btn ghost" target="_blank" rel="noopener">Live ↗</a></div>
+      </div>
+    </div>`;
+  document.body.appendChild(lb);
+  const lbImg=lb.querySelector('img'), lbPh=lb.querySelector('.pc-ph'), lbTitle=lb.querySelector('h3'),
+        lbTag=lb.querySelector('.pc-tag'), lbLink=lb.querySelector('.lb-links a'), lbDots=lb.querySelector('.lb-dots');
+  let cur=null, idx=0;
+
+  function showShot(){
+    const s=cur.shots[idx];
+    lbImg.style.display=''; lbPh.style.display='none';
+    lbImg.onerror=()=>{ lbImg.style.display='none'; lbPh.style.display='block'; lbPh.textContent=cur.ph||'🖼️'; };
+    lbImg.src=s;
+    [...lbDots.children].forEach((d,k)=>d.classList.toggle('on',k===idx));
+  }
+  function openLB(p){
+    cur=p; idx=0;
+    lbTitle.textContent=p.title; lbTag.textContent=p.tag;
+    if(p.url&&p.url!=='#'){ lbLink.style.display=''; lbLink.href=p.url; } else lbLink.style.display='none';
+    lbDots.innerHTML=''; p.shots.forEach((_,k)=>{const d=document.createElement('i');d.onclick=()=>{idx=k;showShot();};lbDots.appendChild(d);});
+    showShot(); lb.classList.add('open');
+  }
+  function step(n){ idx=(idx+n+cur.shots.length)%cur.shots.length; showShot(); }
+  function close(){ lb.classList.remove('open'); }
+  lb.querySelector('.lb-prev').onclick=e=>{e.stopPropagation();step(-1);};
+  lb.querySelector('.lb-next').onclick=e=>{e.stopPropagation();step(1);};
+  lb.querySelector('.lb-close').onclick=close;
+  lb.addEventListener('click',e=>{ if(e.target===lb) close(); });
+  addEventListener('keydown',e=>{ if(!lb.classList.contains('open'))return;
+    if(e.key==='Escape')close(); else if(e.key==='ArrowRight')step(1); else if(e.key==='ArrowLeft')step(-1); });
+
+  // build cards
+  PROJECTS.forEach(p=>{
+    const card=document.createElement('div'); card.className='project-card reveal';
+    card.innerHTML=`
+      <div class="pc-bar"><i></i><i></i><i></i><span class="pc-url">${p.domain||'localhost:3000'}</span></div>
+      <div class="pc-shot">
+        <img alt="${p.title} preview" src="${p.shots[0]}">
+        <span class="pc-ph">${p.ph||'🖼️'}</span>
+        <span class="pc-count">🖼 ${p.shots.length}</span>
+        <div class="pc-overlay">🔍 Preview</div>
+      </div>
+      <div class="pc-body">
+        <span class="pc-tag">${p.tag}</span>
+        <h3>${p.title}</h3>
+        <p>${p.desc}</p>
+        <div class="pc-tech">${p.tech.map(t=>`<span>${t}</span>`).join('')}</div>
+      </div>`;
+    const shot=card.querySelector('.pc-shot'), img=card.querySelector('.pc-shot img');
+    img.onerror=()=>shot.classList.add('noimg');
+    card.addEventListener('click',()=>openLB(p));
+    // 3D tilt on hover (parallax)
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const rx=((e.clientY-r.top)/r.height-0.5)*-8, ry=((e.clientX-r.left)/r.width-0.5)*10;
+      card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave',()=>{ card.style.transform=''; });
+    grid.appendChild(card);
+  });
+
+  // "constantly building" teaser card
+  const ghost=document.createElement('div');
+  ghost.className='project-card ghost reveal';
+  ghost.innerHTML=`
+    <div class="pc-bar"><i></i><i></i><i></i><span class="pc-url">building…</span></div>
+    <div class="pc-shot noimg"><span class="pc-ph">🚧</span></div>
+    <div class="pc-body">
+      <span class="pc-tag">In progress</span>
+      <h3>More on the way<span class="dots"><i>.</i><i>.</i><i>.</i></span></h3>
+      <p>Constantly building new projects — check back soon.</p>
+    </div>`;
+  grid.appendChild(ghost);
+})();
 
 /* =========================================================
    2. NAV + SCROLL REVEAL + SKILL BARS
@@ -420,38 +671,35 @@ let selectStep=()=>{};
 
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(45,1,.1,100);
-  const MAP_ZOOM=1.6;          // camera distance for the "map" view that follows the traveller
-  let targetZoom=MAP_ZOOM, camDist=MAP_ZOOM;
+  // Default distance; the soft edge-mask hides any slight overfill so we can zoom in more freely.
+  const MAP_ZOOM=2.5; let targetZoom=MAP_ZOOM, camDist=MAP_ZOOM;
   camera.position.set(0,0,MAP_ZOOM);
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 
   const world=new THREE.Group();scene.add(world);
-  const R=1, UP=new THREE.Vector3(0,1,0);
+  const R=1;
 
-  // ---- Earth (clear daytime texture) ----
-  const globeMat=new THREE.MeshPhongMaterial({color:0x22406b,emissive:0x0a1730,shininess:14});
-  world.add(new THREE.Mesh(new THREE.SphereGeometry(R,64,64),globeMat));
+  // ---- sharp Earth, lit dark & moody (front-lit centre, dark falloff at the rim) ----
+  const globeMat=new THREE.MeshPhongMaterial({color:0x0a1226,emissive:0x02040a,shininess:6});
+  world.add(new THREE.Mesh(new THREE.SphereGeometry(R,72,72),globeMat));
   const loader=new THREE.TextureLoader();loader.setCrossOrigin('anonymous');
-  loader.load(
-    // 4096x2048 day map (CORS-friendly via jsDelivr) — much sharper when zoomed in
-    'https://cdn.jsdelivr.net/gh/turban/webgl-earth@master/images/2_no_clouds_4k.jpg',
+  loader.load('https://cdn.jsdelivr.net/gh/turban/webgl-earth@master/images/2_no_clouds_4k.jpg',
     tex=>{ tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
-      globeMat.map=tex; globeMat.color.set(0xffffff); globeMat.emissive.set(0x0a1424); globeMat.needsUpdate=true; },
-    undefined, ()=>{}
-  );
+      globeMat.map=tex; globeMat.color.set(0x8fa2c4); globeMat.emissive.set(0x05080f); globeMat.needsUpdate=true; },
+    undefined, ()=>{});
 
-  // faint grid + atmosphere
-  world.add(new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.SphereGeometry(R+.003,24,18)),
-    new THREE.LineBasicMaterial({color:0x9fc4ff,transparent:true,opacity:.08})));
-  world.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.16,48,48),
-    new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,uniforms:{c:{value:new THREE.Color(0x6ea8ff)}},
+  // faint grid + blue atmosphere rim
+  world.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.SphereGeometry(R+.003,24,18)),
+    new THREE.LineBasicMaterial({color:0x6ea8ff,transparent:true,opacity:.07})));
+  world.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.09,48,48),
+    new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,uniforms:{c:{value:new THREE.Color(0x4d7fff)}},
       vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader:`varying vec3 vN;uniform vec3 c;void main(){float i=pow(.6-dot(vN,vec3(0,0,1.)),3.);gl_FragColor=vec4(c,i*.9);}`})));
+      fragmentShader:`varying vec3 vN;uniform vec3 c;void main(){float i=pow(.62-dot(vN,vec3(0,0,1.)),3.);gl_FragColor=vec4(c,i);}`})));
 
-  scene.add(new THREE.AmbientLight(0xbcd2ff,1.05));
-  const dl=new THREE.DirectionalLight(0xffffff,.75);dl.position.set(2,1.5,3);scene.add(dl);
+  scene.add(new THREE.AmbientLight(0x18233f,0.28));
+  const key=new THREE.DirectionalLight(0xdfe8ff,0.95); key.position.set(0.4,0.5,1.6); scene.add(key);
+  const rim=new THREE.DirectionalLight(0x4d7fff,0.18); rim.position.set(-1.5,0.6,-1); scene.add(rim);
 
   // lat/lon -> vec3 on the sphere
   function ll(lat,lon,rad=R){
@@ -459,46 +707,64 @@ let selectStep=()=>{};
     return new THREE.Vector3(-rad*Math.sin(p)*Math.cos(t), rad*Math.cos(p), rad*Math.sin(p)*Math.sin(t));
   }
 
-  // ---- city dots + name labels ----
+  // ---- city dots + name labels (only the active one shows) ----
   function makeLabel(text){
     const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
     x.font='bold 34px Segoe UI, sans-serif';x.textAlign='center';x.textBaseline='middle';
-    x.shadowColor='rgba(0,0,0,.85)';x.shadowBlur=8;x.fillStyle='#fff';x.fillText(text,128,34);
+    x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=8;x.fillStyle='#fff';x.fillText(text,128,34);
     const t=new THREE.CanvasTexture(c);t.anisotropy=4;
-    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));
-    sp.center.set(0.5,-1.5); sp.scale.set(0.24,0.06,1); return sp;
-  }
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false,depthWrite:false}));
+sp.center.set(0.5,-0.55);
+sp.scale.set(0.24,0.06,1);
+return sp;  }
   const labels=[];
   STOPS.forEach(s=>{
     const p=ll(s.lat,s.lon,R+.006);
-    const dot=new THREE.Mesh(new THREE.SphereGeometry(.016,14,14),new THREE.MeshBasicMaterial({color:0xffffff}));
+    const dot=new THREE.Mesh(new THREE.SphereGeometry(.008,12,12),new THREE.MeshBasicMaterial({color:0xffffff}));
     dot.position.copy(p); world.add(dot);
-    const lab=makeLabel(s.title); lab.position.copy(p.clone().normalize().multiplyScalar(R+.03));
+    const lab=makeLabel(s.title); lab.position.copy(p.clone().normalize().multiplyScalar(R+.018));
     lab.visible=false; world.add(lab); labels.push(lab);
   });
 
-  // ---- route line across all stops ----
+  // ---- route line across the stops ----
   const routePts=[];
   for(let i=0;i<STOPS.length-1;i++){
     const a=ll(STOPS[i].lat,STOPS[i].lon,1), b=ll(STOPS[i+1].lat,STOPS[i+1].lon,1);
-    for(let s=0;s<=26;s++) routePts.push(a.clone().lerp(b,s/26).normalize().multiplyScalar(R+.005));
+    for(let s=0;s<=26;s++) routePts.push(a.clone().lerp(b,s/26).normalize().multiplyScalar(R+.006));
   }
   world.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(routePts),
     new THREE.LineBasicMaterial({color:0xffd23f,transparent:true,opacity:.9})));
 
-  // ---- traveller avatar: an emoji that evolves each chapter (kid -> nerd -> professional) ----
-  function emojiTex(ch){
+  // ---- traveller avatar: a little black-haired character that evolves each chapter ----
+  function avatarTexture(type){
     const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
-    x.font='104px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
-    x.textAlign='center';x.textBaseline='middle';x.fillText(ch,64,74);
+    const cx=64;
+    if(type==='biz'){                              // suit shoulders + collar + tie
+      x.fillStyle='#26304d'; x.beginPath(); x.moveTo(26,128); x.lineTo(40,88); x.lineTo(88,88); x.lineTo(102,128); x.closePath(); x.fill();
+      x.fillStyle='#eef2ff'; x.beginPath(); x.moveTo(54,88); x.lineTo(64,106); x.lineTo(74,88); x.closePath(); x.fill();
+      x.fillStyle='#c0304a'; x.beginPath(); x.moveTo(64,94); x.lineTo(59,106); x.lineTo(64,124); x.lineTo(69,106); x.closePath(); x.fill();
+    }
+    x.fillStyle='#141414'; x.beginPath(); x.arc(cx,57,29,0,7); x.fill();     // black hair
+    x.fillStyle='#eab488'; x.beginPath(); x.arc(cx,70,25,0,7); x.fill();     // face
+    x.beginPath(); x.arc(40,72,5,0,7); x.arc(88,72,5,0,7); x.fill();         // ears
+    x.fillStyle='#1a1a1a';
+    if(type==='nerd'){                             // glasses
+      x.strokeStyle='#141414'; x.lineWidth=3;
+      x.beginPath(); x.arc(55,70,8,0,7); x.moveTo(81,70); x.arc(73,70,8,0,7); x.stroke();
+      x.beginPath(); x.moveTo(63,70); x.lineTo(65,70); x.stroke();
+      x.beginPath(); x.arc(55,70,2.6,0,7); x.arc(73,70,2.6,0,7); x.fill();
+    } else {
+      x.beginPath(); x.arc(56,70,2.8,0,7); x.arc(72,70,2.8,0,7); x.fill();
+    }
+    x.strokeStyle='#9c6544'; x.lineWidth=2.4; x.beginPath(); x.arc(cx,74,9,0.15*Math.PI,0.85*Math.PI); x.stroke(); // smile
     const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;
   }
-  const avatarTex=STOPS.map(s=>emojiTex(s.emoji));
+  const avatarTex=[avatarTexture('kid'),avatarTexture('nerd'),avatarTexture('biz')];
   const avatar=new THREE.Sprite(new THREE.SpriteMaterial({map:avatarTex[0],transparent:true,depthTest:false,depthWrite:false}));
-  avatar.center.set(0.5,0.05); avatar.scale.set(0.1,0.1,1); avatar.renderOrder=10; world.add(avatar);
+  avatar.center.set(0.5,0.05); avatar.scale.set(0.055,0.055,1); avatar.renderOrder=30; world.add(avatar);
   let avatarIdx=0;
 
-  // rotate the world so a lat/lon faces the camera (keeps the traveller centered)
+  // rotate the world so a lat/lon faces the camera (keeps the traveller centered + lit)
   function faceTo(lat,lon){
     targetRotY = -((lon+180)*Math.PI/180) - Math.PI/2 + Math.PI;
     targetRotX = (lat)*Math.PI/180;
@@ -508,7 +774,6 @@ let selectStep=()=>{};
   let rotX=0,rotY=0,targetRotX=0,targetRotY=0,dragging=false,px=0,py=0;
   let curP=0,tgtP=0,clk=0;
 
-  // place the avatar at progress p (0..1) along the route; morph emoji + city label to the nearest stop
   function setPos(p){
     p=Math.max(0,Math.min(1,p));
     const seg=STOPS.length-1;
@@ -516,7 +781,7 @@ let selectStep=()=>{};
     const a=STOPS[i], b=STOPS[i+1];
     const lat=a.lat+(b.lat-a.lat)*t, lon=a.lon+(b.lon-a.lon)*t;
     const n=ll(lat,lon,R).normalize();
-    const hop=Math.abs(tgtP-curP)>0.002 ? Math.abs(Math.sin(clk*10))*0.02 : 0; // little hop while travelling
+    const hop=Math.abs(tgtP-curP)>0.002 ? Math.abs(Math.sin(clk*10))*0.02 : 0;
     avatar.position.copy(n.clone().multiplyScalar(R+0.02+hop));
     faceTo(lat,lon);
     const near=Math.round(p*seg);
@@ -524,37 +789,42 @@ let selectStep=()=>{};
     labels.forEach((l,k)=>l.visible=(k===near));
   }
 
-  // ---- selected chapter (called by the vertical timeline) ----
+  // ---- selected chapter (called by the vertical timeline); ignores the "buffering" teaser ----
   selectStep=function(i){
+    if(i>=STOPS.length) return;
     tgtP=i/(STOPS.length-1); targetZoom=MAP_ZOOM;
     document.querySelectorAll('.tl-item').forEach(el=>el.classList.toggle('active',+el.dataset.i===i));
   };
 
-  // ---- drag to look around, wheel to zoom ----
-  function down(e){dragging=true;px=(e.touches?e.touches[0].clientX:e.clientX);py=(e.touches?e.touches[0].clientY:e.clientY);}
+  // ---- drag to rotate, wheel to zoom ----
+  let touchMode=null; // on touch: undecided -> 'rotate' | 'scroll' (lets vertical swipes scroll the page)
+  function down(e){dragging=true;touchMode=e.touches?null:'rotate';px=(e.touches?e.touches[0].clientX:e.clientX);py=(e.touches?e.touches[0].clientY:e.clientY);}
   function move(e){ if(!dragging)return;
     const cx=(e.touches?e.touches[0].clientX:e.clientX),cy=(e.touches?e.touches[0].clientY:e.clientY);
-    targetRotY+=(cx-px)*.006; targetRotX=Math.max(-1.3,Math.min(1.3,targetRotX+(cy-py)*.006));
+    if(touchMode===null){                       // first touch move decides intent
+      const adx=Math.abs(cx-px),ady=Math.abs(cy-py);
+      if(adx<5&&ady<5) return;
+      touchMode = adx>ady ? 'rotate' : 'scroll';
+      if(touchMode==='scroll'){ dragging=false; return; } // hand the gesture back to the page
+    }
+    targetRotY+=(cx-px)*.007; targetRotX=Math.max(-1.45,Math.min(1.45,targetRotX+(cy-py)*.007));
     px=cx;py=cy;
   }
   function up(){dragging=false;}
   canvas.addEventListener('mousedown',down);addEventListener('mousemove',move);addEventListener('mouseup',up);
   canvas.addEventListener('touchstart',down,{passive:true});canvas.addEventListener('touchmove',move,{passive:true});canvas.addEventListener('touchend',up);
   canvas.addEventListener('wheel',e=>{e.preventDefault();
-    targetZoom=Math.max(1.25,Math.min(4.2,targetZoom+e.deltaY*0.0016));},{passive:false});
+    // scale the step with distance so zooming stays smooth up close and far away
+    targetZoom=Math.max(1.14,Math.min(5.4,targetZoom+e.deltaY*0.0016*targetZoom));},{passive:false});
 
-  // ---- resize ----
   function resize(){const s=size();renderer.setSize(s,s,false);camera.aspect=1;camera.updateProjectionMatrix();}
   resize();addEventListener('resize',resize);
 
-  // ---- start at Belgrade, snap the view there ----
   setPos(0); rotX=targetRotX; rotY=targetRotY;
 
-  // ---- animate ----
   function loop(){
     requestAnimationFrame(loop);clk+=.016;
-    curP+=(tgtP-curP)*0.045;           // ease the avatar toward the selected chapter
-    setPos(curP);
+    curP+=(tgtP-curP)*0.045; setPos(curP);
     rotX+=(targetRotX-rotX)*.09; rotY+=(targetRotY-rotY)*.09;
     world.rotation.y=rotY; world.rotation.x=rotX;
     camDist+=(targetZoom-camDist)*.07; camera.position.set(0,0,camDist);
