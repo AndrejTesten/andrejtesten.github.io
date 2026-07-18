@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Andrej Testen</title>
+<style>
+  :root{
+    --bg:#05060f;
+    --bg2:#0b1024;
+    --ink:#eaf0ff;
+    --muted:#8b93b8;
+    --accent:#6ea8ff;
+    --accent2:#c47bff;
+    --accent3:#3ef2c4;
+    --card:rgba(255,255,255,.045);
+    --card-br:rgba(255,255,255,.10);
+    --glow:0 10px 40px rgba(110,168,255,.18);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 70% -10%,#141a3a 0%,var(--bg2) 40%,var(--bg) 100%);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+
+  /* ---------- floating starfield ---------- */
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px clamp(16px,5vw,60px);
+    backdrop-filter:blur(12px);
+    background:linear-gradient(to bottom,rgba(5,6,15,.75),rgba(5,6,15,0));
+  }
+  .brand{font-weight:800;letter-spacing:.5px;font-size:1.05rem}
+  .brand span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .navlinks{display:flex;gap:22px;font-size:.92rem;color:var(--muted)}
+  .navlinks a{transition:color .2s}
+  .navlinks a:hover{color:var(--ink)}
+  .navlinks .blog{color:var(--accent3);font-weight:600}
+  .burger{display:none;font-size:1.5rem;background:none;border:0;color:var(--ink);cursor:pointer}
+  @media(max-width:760px){
+    .navlinks{position:fixed;inset:64px 0 auto 0;flex-direction:column;gap:0;
+      background:rgba(9,12,30,.97);backdrop-filter:blur(14px);padding:10px 24px;
+      transform:translateY(-140%);transition:transform .32s ease;border-bottom:1px solid var(--card-br)}
+    .navlinks.open{transform:translateY(0)}
+    .navlinks a{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+    .burger{display:block}
+  }
+
+  section{position:relative;z-index:2;padding:110px clamp(16px,6vw,90px)}
+  .eyebrow{color:var(--accent3);font-size:.8rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+  h2.title{font-size:clamp(1.8rem,4vw,2.8rem);margin:0 0 8px;font-weight:800}
+  .sub{color:var(--muted);max-width:560px;margin-bottom:44px;line-height:1.6}
+
+  /* ---------- hero ---------- */
+  .hero{min-height:100vh;display:flex;align-items:center;padding-top:120px}
+  .hero-inner{max-width:720px}
+  .hi{color:var(--accent);font-weight:600;letter-spacing:1px;margin-bottom:8px}
+  .hero h1{font-size:clamp(2.6rem,8vw,5rem);line-height:1.02;margin:0 0 18px;font-weight:900;letter-spacing:-1px}
+  .hero h1 .grad{background:linear-gradient(100deg,var(--accent),var(--accent2) 55%,var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{font-size:1.2rem;color:var(--muted);line-height:1.7;max-width:560px}
+  .cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+  .btn{padding:13px 26px;border-radius:40px;font-weight:700;font-size:.95rem;cursor:pointer;border:1px solid transparent;transition:transform .18s,box-shadow .18s}
+  .btn:hover{transform:translateY(-3px)}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#08091a;box-shadow:var(--glow)}
+  .btn.ghost{background:var(--card);border-color:var(--card-br);color:var(--ink)}
+  .scroll-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.8rem;letter-spacing:2px;animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+  /* ---------- globe / journey ---------- */
+  .journey-wrap{display:grid;grid-template-columns:1fr .85fr;gap:44px;align-items:center}
+  @media(max-width:900px){.journey-wrap{grid-template-columns:1fr}}
+  #globe-holder{position:relative;width:100%;aspect-ratio:1/1;max-width:520px;margin:0 auto;cursor:grab}
+  #globe-holder:active{cursor:grabbing}
+  /* radial mask fades the canvas edges so the globe never shows a hard square, at any zoom */
+  #globe-canvas{display:block;background:transparent;
+    -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 60%,transparent 76%);
+    mask-image:radial-gradient(circle at 50% 50%,#000 60%,transparent 76%)}
+  .timeline{position:relative;padding-left:30px}
+  .timeline::before{content:'';position:absolute;left:9px;top:10px;bottom:10px;width:2px;background:linear-gradient(var(--accent),var(--accent2))}
+  .tl-item{position:relative;margin-bottom:20px;cursor:pointer;transition:transform .18s}
+  .tl-item:hover{transform:translateX(4px)}
+  .tl-item::before{content:'';position:absolute;left:-30px;top:4px;width:20px;height:20px;border-radius:50%;
+    background:var(--bg2);border:3px solid var(--accent);box-shadow:0 0 0 4px rgba(110,168,255,.10);transition:.2s}
+  .tl-item.active::before{background:var(--accent2);border-color:var(--accent2);box-shadow:0 0 0 6px rgba(196,123,255,.22)}
+  .tl-emoji{font-size:1.6rem;line-height:1;margin-bottom:3px}
+  .tl-year{font-size:.75rem;color:var(--accent3);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+  .tl-title{font-weight:700;font-size:1.1rem;margin:2px 0 3px}
+  .tl-desc{font-size:.9rem;color:var(--muted);line-height:1.55;max-height:0;overflow:hidden;opacity:0;transition:.34s}
+  .tl-item.active .tl-desc{max-height:150px;opacity:1;margin-top:6px}
+
+  /* ---------- generic cards ---------- */
+  .grid{display:grid;gap:18px}
+  .cards-2{grid-template-columns:repeat(2,1fr)}
+  .cards-3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:820px){.cards-2,.cards-3{grid-template-columns:1fr}}
+  .card{
+    background:var(--card);border:1px solid var(--card-br);border-radius:18px;padding:24px;
+    transition:transform .2s,border-color .2s,background .2s;position:relative;overflow:hidden
+  }
+  .card:hover{transform:translateY(-6px);border-color:var(--accent);background:rgba(110,168,255,.06)}
+  .card h3{margin:0 0 14px;font-size:1.15rem;display:flex;align-items:center;gap:10px}
+  .card .ico{font-size:1.4rem}
+
+  /* skills */
+  .skill{margin-bottom:16px}
+  .skill-top{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:6px}
+  .skill-top b{font-weight:600}
+  .skill-top span{color:var(--muted);font-size:.82rem}
+  .bar{height:8px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;border-radius:8px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chip{padding:9px 16px;border-radius:30px;background:var(--card);border:1px solid var(--card-br);font-size:.88rem;
+    transition:.2s;cursor:default}
+  .chip:hover{border-color:var(--accent2);color:var(--accent2);transform:translateY(-2px)}
+
+  /* certificates */
+  .cert{display:flex;gap:16px;align-items:flex-start}
+  .cert .badge{flex:0 0 46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:1.4rem;
+    background:linear-gradient(135deg,rgba(110,168,255,.25),rgba(196,123,255,.25));border:1px solid var(--card-br)}
+  .cert .body b{display:block;font-size:1rem}
+  .cert .body span{font-size:.83rem;color:var(--muted)}
+  .cert .body em{font-size:.78rem;color:var(--accent3);font-style:normal}
+
+  /* interests */
+  .interests{display:flex;flex-wrap:wrap;gap:16px}
+  .hobby{flex:1 1 150px;min-width:150px;text-align:center;padding:26px 16px;border-radius:18px;
+    background:var(--card);border:1px solid var(--card-br);transition:.25s}
+  .hobby:hover{transform:translateY(-6px) rotate(-1deg);border-color:var(--accent3);background:rgba(62,242,196,.06)}
+  .hobby .emo{font-size:2.2rem;display:block;margin-bottom:10px}
+  .hobby b{font-size:.98rem}
+  .hobby p{margin:6px 0 0;font-size:.8rem;color:var(--muted)}
+
+  /* blog cta */
+  .blog-cta{text-align:center;background:linear-gradient(135deg,rgba(110,168,255,.12),rgba(196,123,255,.10));
+    border:1px solid var(--card-br);border-radius:24px;padding:60px 24px}
+  .blog-cta h2{font-size:clamp(1.6rem,4vw,2.4rem);margin:0 0 12px}
+  .blog-cta p{color:var(--muted);max-width:480px;margin:0 auto 28px;line-height:1.6}
+
+  footer{position:relative;z-index:2;text-align:center;padding:40px 20px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--card-br)}
+  footer a{color:var(--accent)}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<nav>
+  <a class="brand" href="#top">✦ <span>Andrej Testen</span></a>
+  <button class="burger" aria-label="menu">☰</button>
+  <div class="navlinks">
+    <a href="#journey">Journey</a>
+    <a href="#skills">Skills</a>
+    <a href="#certs">Certificates</a>
+    <a href="#interests">Interests</a>
+    <a class="blog" href="#" target="_blank" rel="noopener">Blog ↗</a>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <div class="hero-inner reveal">
+    <div class="hi">👋 Hi, I'm</div>
+    <h1><span class="grad">Andrej Testen</span></h1>
+    <p>SOFTWARE ENGINEER - crafting secure fintech solutions and scalable web applications. Born in Belgrade, now creating things in Ljubljana.</p>
+    <div class="cta">
+      <a class="btn primary" href="#journey">Explore my journey 🌍</a>
+      <a class="btn ghost" href="#" target="_blank" rel="noopener" data-blog>Read my blog ↗</a>
+    </div>
+  </div>
+  <div class="scroll-hint">SCROLL ↓</div>
+</section>
+
+<!-- ================= JOURNEY / GLOBE ================= -->
+<section id="journey">
+  <div class="reveal">
+    <div class="eyebrow">My path across the map</div>
+    <h2 class="title">The Journey 🌍</h2>
+    <p class="sub">Click a chapter and watch me travel — and grow up — from Belgrade to Slovenia. Drag the globe to look around, scroll to zoom.</p>
+  </div>
+  <div class="journey-wrap">
+    <div id="globe-holder" class="reveal"><canvas id="globe-canvas"></canvas></div>
+    <div class="timeline reveal" id="timeline"></div>
+  </div>
+</section>
+
+<!-- ================= SKILLS ================= -->
+<section id="skills">
+  <div class="reveal">
+    <div class="eyebrow">What I bring</div>
+    <h2 class="title">Skills 🧠</h2>
+    <p class="sub">The technical toolbox and the human side — both matter.</p>
+  </div>
+  <div class="grid cards-2">
+    <div class="card reveal">
+      <h3><span class="ico">⚙️</span> Hard Skills</h3>
+      <div id="hardskills"></div>
+    </div>
+    <div class="card reveal">
+      <h3><span class="ico">💬</span> Soft Skills</h3>
+      <div class="chips" id="softskills"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CERTIFICATES ================= -->
+<section id="certs">
+  <div class="reveal">
+    <div class="eyebrow">Proof of the grind</div>
+    <h2 class="title">Certificates 📜</h2>
+    <p class="sub">Courses and credentials I've earned along the way.</p>
+  </div>
+  <div class="grid cards-3" id="certlist"></div>
+</section>
+
+<!-- ================= INTERESTS ================= -->
+<section id="interests">
+  <div class="reveal">
+    <div class="eyebrow">Off the clock</div>
+    <h2 class="title">Interests & Hobbies 🎯</h2>
+    <p class="sub">What keeps me curious and recharged.</p>
+  </div>
+  <div class="interests" id="hobbylist"></div>
+</section>
+
+<!-- ================= BLOG CTA ================= -->
+<section id="blog">
+  <div class="blog-cta reveal">
+    <h2>I write things too ✍️</h2>
+    <p>Thoughts on tech, learning, and the journey from Belgrade to Ljubljana. Come say hi on my blog.</p>
+    <a class="btn primary" href="#" target="_blank" rel="noopener" data-blog>Visit my blog ↗</a>
+  </div>
+</section>
+
+<footer>
+  Built with ❤️ and Three.js · © <span id="year"></span> YOUR NAME · <a href="#" data-blog target="_blank" rel="noopener">Blog</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* =========================================================
+   0. EDIT YOUR CONTENT HERE
+   ========================================================= */
+const BLOG_URL = "#"; // <-- put your blog link here
+
+// Each stop is a chapter of the journey. Click one and the little avatar travels there — and grows up.
+const STOPS = [
+  { emoji:"🧒", year:"Born & Raised", title:"Belgrade", place:"Serbia 🇷🇸",
+    desc:"Just a Belgrade kid — born, raised, and finished high school here.",
+    lat:44.7866, lon:20.4489 },
+  { emoji:"🤓", year:"Bachelor's Degree", title:"Novo Mesto", place:"Slovenia 🇸🇮",
+    desc:"Moved to Novo Mesto and turned into a full-blown nerd earning my bachelor's degree.",
+    lat:45.8010, lon:15.1710 },
+  { emoji:"👨‍💼", year:"Now — Work", title:"Ljubljana", place:"Slovenia 🇸🇮",
+    desc:"Leveled up into a working professional in Ljubljana, building things I'm proud of.",
+    lat:46.0569, lon:14.5058 },
+];
+
+const HARD_SKILLS = [
+  { name: "TypeScript", level: 95 },
+  { name: "React", level: 90 },
+  { name: "Angular", level: 85 },
+  { name: "ASP.NET Core", level: 85 },
+  { name: "SQL", level: 90 },
+  { name: "Payments & PSD2", level: 90 },
+  { name: "DORA Compliance", level: 80 },
+  { name: "Open Banking APIs", level: 80 },
+];
+
+const SOFT_SKILLS = [
+  "Problem Solving",
+  "Analytical Thinking",
+  "Communication",
+  "Team Collaboration",
+  "Adaptability",
+  "Ownership",
+  "Attention to Detail",
+  "Continuous Learning",
+];
+
+const CERTIFICATES = [
+  {
+    icon: "🎓",
+    name: "B.Sc. Computer Science",
+    org: "Faculty of Information Studies, Novo Mesto",
+    year: "2024",
+  },
+  {
+    icon: "☁️",
+    name: "AWS Certified Cloud Practitioner",
+    org: "Amazon Web Services",
+    year: "2026",
+  },
+  {
+    icon: "🔒",
+    name: "CompTIA Security+",
+    org: "CompTIA",
+    year: "2026",
+  },
+];
+
+const HOBBIES = [
+  {
+    emo: "🏀",
+    name: "Basketball",
+    note: "10 years in amateur leagues",
+  },
+  {
+    emo: "📷",
+    name: "Photography",
+    note: "Street & travel photography • VSCO",
+  },
+  {
+    emo: "✈️",
+    name: "Travel",
+    note: "10 countries and loading...",
+  },
+  {
+    emo: "📚",
+    name: "Reading",
+    note: "Technology, software & startups",
+  },
+];
+
+/* =========================================================
+   1. RENDER CONTENT
+   ========================================================= */
+document.getElementById('year').textContent = new Date().getFullYear();
+document.querySelectorAll('[data-blog], .navlinks .blog').forEach(a=>{ if(BLOG_URL && BLOG_URL!=="#") a.href=BLOG_URL; });
+
+const tl=document.getElementById('timeline');
+STOPS.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='tl-item'+(i===0?' active':''); d.dataset.i=i;
+  d.innerHTML=`<div class="tl-emoji">${s.emoji}</div>
+    <div class="tl-year">${s.year}</div>
+    <div class="tl-title">${s.title} · ${s.place}</div>
+    <div class="tl-desc">${s.desc}</div>`;
+  d.addEventListener('click',()=>selectStep(i));
+  tl.appendChild(d);
+});
+
+const hs=document.getElementById('hardskills');
+HARD_SKILLS.forEach(s=>{
+  const el=document.createElement('div');el.className='skill';
+  el.innerHTML=`<div class="skill-top"><b>${s.name}</b><span>${s.level}%</span></div>
+    <div class="bar"><i data-w="${s.level}"></i></div>`;
+  hs.appendChild(el);
+});
+
+const ss=document.getElementById('softskills');
+SOFT_SKILLS.forEach(s=>{const c=document.createElement('span');c.className='chip';c.textContent=s;ss.appendChild(c);});
+
+const cl=document.getElementById('certlist');
+CERTIFICATES.forEach(c=>{
+  const el=document.createElement('div');el.className='card cert reveal';
+  el.innerHTML=`<div class="badge">${c.icon}</div>
+    <div class="body"><b>${c.name}</b><span>${c.org}</span><br><em>${c.year}</em></div>`;
+  cl.appendChild(el);
+});
+
+const hl=document.getElementById('hobbylist');
+HOBBIES.forEach(h=>{
+  const el=document.createElement('div');el.className='hobby reveal';
+  el.innerHTML=`<span class="emo">${h.emo}</span><b>${h.name}</b><p>${h.note}</p>`;
+  hl.appendChild(el);
+});
+
+/* =========================================================
+   2. NAV + SCROLL REVEAL + SKILL BARS
+   ========================================================= */
+const burger=document.querySelector('.burger'), links=document.querySelector('.navlinks');
+burger.addEventListener('click',()=>links.classList.toggle('open'));
+links.addEventListener('click',e=>{if(e.target.tagName==='A')links.classList.remove('open');});
+
+const io=new IntersectionObserver(es=>{
+  es.forEach(en=>{
+    if(en.isIntersecting){
+      en.target.classList.add('in');
+      en.target.querySelectorAll?.('.bar>i').forEach(b=>b.style.width=b.dataset.w+'%');
+      io.unobserve(en.target);
+    }
+  });
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+// also trigger skill bars when skills card revealed
+new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){
+  document.querySelectorAll('.bar>i').forEach(b=>b.style.width=b.dataset.w+'%');
+}}),{threshold:.3}).observe(document.getElementById('skills'));
+
+/* =========================================================
+   3. STARFIELD BACKGROUND
+   ========================================================= */
+(function(){
+  const c=document.getElementById('stars'),x=c.getContext('2d');let w,h,st=[];
+  function rs(){w=c.width=innerWidth;h=c.height=innerHeight;st=[];for(let i=0;i<140;i++)st.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.2,a:Math.random(),s:Math.random()*.02+.005});}
+  function draw(){x.clearRect(0,0,w,h);st.forEach(p=>{p.a+=p.s;const o=.4+Math.abs(Math.sin(p.a))*.6;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle='rgba(200,215,255,'+o+')';x.fill();});requestAnimationFrame(draw);}
+  rs();draw();addEventListener('resize',rs);
+})();
+
+/* =========================================================
+   4. THREE.JS GLOBE
+   ========================================================= */
+let selectStep=()=>{};
+(function(){
+  const holder=document.getElementById('globe-holder');
+  const canvas=document.getElementById('globe-canvas');
+  const size=()=>Math.min(holder.clientWidth,holder.clientHeight)||480;
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(45,1,.1,100);
+  const MAP_ZOOM=1.6;          // camera distance for the "map" view that follows the traveller
+  let targetZoom=MAP_ZOOM, camDist=MAP_ZOOM;
+  camera.position.set(0,0,MAP_ZOOM);
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+  const world=new THREE.Group();scene.add(world);
+  const R=1, UP=new THREE.Vector3(0,1,0);
+
+  // ---- Earth (clear daytime texture) ----
+  const globeMat=new THREE.MeshPhongMaterial({color:0x22406b,emissive:0x0a1730,shininess:14});
+  world.add(new THREE.Mesh(new THREE.SphereGeometry(R,64,64),globeMat));
+  const loader=new THREE.TextureLoader();loader.setCrossOrigin('anonymous');
+  loader.load(
+    // 4096x2048 day map (CORS-friendly via jsDelivr) — much sharper when zoomed in
+    'https://cdn.jsdelivr.net/gh/turban/webgl-earth@master/images/2_no_clouds_4k.jpg',
+    tex=>{ tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+      globeMat.map=tex; globeMat.color.set(0xffffff); globeMat.emissive.set(0x0a1424); globeMat.needsUpdate=true; },
+    undefined, ()=>{}
+  );
+
+  // faint grid + atmosphere
+  world.add(new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.SphereGeometry(R+.003,24,18)),
+    new THREE.LineBasicMaterial({color:0x9fc4ff,transparent:true,opacity:.08})));
+  world.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.16,48,48),
+    new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,uniforms:{c:{value:new THREE.Color(0x6ea8ff)}},
+      vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader:`varying vec3 vN;uniform vec3 c;void main(){float i=pow(.6-dot(vN,vec3(0,0,1.)),3.);gl_FragColor=vec4(c,i*.9);}`})));
+
+  scene.add(new THREE.AmbientLight(0xbcd2ff,1.05));
+  const dl=new THREE.DirectionalLight(0xffffff,.75);dl.position.set(2,1.5,3);scene.add(dl);
+
+  // lat/lon -> vec3 on the sphere
+  function ll(lat,lon,rad=R){
+    const p=(90-lat)*Math.PI/180, t=(lon+180)*Math.PI/180;
+    return new THREE.Vector3(-rad*Math.sin(p)*Math.cos(t), rad*Math.cos(p), rad*Math.sin(p)*Math.sin(t));
+  }
+
+  // ---- city dots + name labels ----
+  function makeLabel(text){
+    const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');
+    x.font='bold 34px Segoe UI, sans-serif';x.textAlign='center';x.textBaseline='middle';
+    x.shadowColor='rgba(0,0,0,.85)';x.shadowBlur=8;x.fillStyle='#fff';x.fillText(text,128,34);
+    const t=new THREE.CanvasTexture(c);t.anisotropy=4;
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));
+    sp.center.set(0.5,-1.5); sp.scale.set(0.24,0.06,1); return sp;
+  }
+  const labels=[];
+  STOPS.forEach(s=>{
+    const p=ll(s.lat,s.lon,R+.006);
+    const dot=new THREE.Mesh(new THREE.SphereGeometry(.016,14,14),new THREE.MeshBasicMaterial({color:0xffffff}));
+    dot.position.copy(p); world.add(dot);
+    const lab=makeLabel(s.title); lab.position.copy(p.clone().normalize().multiplyScalar(R+.03));
+    lab.visible=false; world.add(lab); labels.push(lab);
+  });
+
+  // ---- route line across all stops ----
+  const routePts=[];
+  for(let i=0;i<STOPS.length-1;i++){
+    const a=ll(STOPS[i].lat,STOPS[i].lon,1), b=ll(STOPS[i+1].lat,STOPS[i+1].lon,1);
+    for(let s=0;s<=26;s++) routePts.push(a.clone().lerp(b,s/26).normalize().multiplyScalar(R+.005));
+  }
+  world.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(routePts),
+    new THREE.LineBasicMaterial({color:0xffd23f,transparent:true,opacity:.9})));
+
+  // ---- traveller avatar: an emoji that evolves each chapter (kid -> nerd -> professional) ----
+  function emojiTex(ch){
+    const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+    x.font='104px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+    x.textAlign='center';x.textBaseline='middle';x.fillText(ch,64,74);
+    const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;
+  }
+  const avatarTex=STOPS.map(s=>emojiTex(s.emoji));
+  const avatar=new THREE.Sprite(new THREE.SpriteMaterial({map:avatarTex[0],transparent:true,depthTest:false,depthWrite:false}));
+  avatar.center.set(0.5,0.05); avatar.scale.set(0.1,0.1,1); avatar.renderOrder=10; world.add(avatar);
+  let avatarIdx=0;
+
+  // rotate the world so a lat/lon faces the camera (keeps the traveller centered)
+  function faceTo(lat,lon){
+    targetRotY = -((lon+180)*Math.PI/180) - Math.PI/2 + Math.PI;
+    targetRotX = (lat)*Math.PI/180;
+  }
+
+  // ---- state ----
+  let rotX=0,rotY=0,targetRotX=0,targetRotY=0,dragging=false,px=0,py=0;
+  let curP=0,tgtP=0,clk=0;
+
+  // place the avatar at progress p (0..1) along the route; morph emoji + city label to the nearest stop
+  function setPos(p){
+    p=Math.max(0,Math.min(1,p));
+    const seg=STOPS.length-1;
+    let f=p*seg, i=Math.min(Math.floor(f),seg-1), t=f-i;
+    const a=STOPS[i], b=STOPS[i+1];
+    const lat=a.lat+(b.lat-a.lat)*t, lon=a.lon+(b.lon-a.lon)*t;
+    const n=ll(lat,lon,R).normalize();
+    const hop=Math.abs(tgtP-curP)>0.002 ? Math.abs(Math.sin(clk*10))*0.02 : 0; // little hop while travelling
+    avatar.position.copy(n.clone().multiplyScalar(R+0.02+hop));
+    faceTo(lat,lon);
+    const near=Math.round(p*seg);
+    if(near!==avatarIdx){ avatarIdx=near; avatar.material.map=avatarTex[near]; avatar.material.needsUpdate=true; }
+    labels.forEach((l,k)=>l.visible=(k===near));
+  }
+
+  // ---- selected chapter (called by the vertical timeline) ----
+  selectStep=function(i){
+    tgtP=i/(STOPS.length-1); targetZoom=MAP_ZOOM;
+    document.querySelectorAll('.tl-item').forEach(el=>el.classList.toggle('active',+el.dataset.i===i));
+  };
+
+  // ---- drag to look around, wheel to zoom ----
+  function down(e){dragging=true;px=(e.touches?e.touches[0].clientX:e.clientX);py=(e.touches?e.touches[0].clientY:e.clientY);}
+  function move(e){ if(!dragging)return;
+    const cx=(e.touches?e.touches[0].clientX:e.clientX),cy=(e.touches?e.touches[0].clientY:e.clientY);
+    targetRotY+=(cx-px)*.006; targetRotX=Math.max(-1.3,Math.min(1.3,targetRotX+(cy-py)*.006));
+    px=cx;py=cy;
+  }
+  function up(){dragging=false;}
+  canvas.addEventListener('mousedown',down);addEventListener('mousemove',move);addEventListener('mouseup',up);
+  canvas.addEventListener('touchstart',down,{passive:true});canvas.addEventListener('touchmove',move,{passive:true});canvas.addEventListener('touchend',up);
+  canvas.addEventListener('wheel',e=>{e.preventDefault();
+    targetZoom=Math.max(1.25,Math.min(4.2,targetZoom+e.deltaY*0.0016));},{passive:false});
+
+  // ---- resize ----
+  function resize(){const s=size();renderer.setSize(s,s,false);camera.aspect=1;camera.updateProjectionMatrix();}
+  resize();addEventListener('resize',resize);
+
+  // ---- start at Belgrade, snap the view there ----
+  setPos(0); rotX=targetRotX; rotY=targetRotY;
+
+  // ---- animate ----
+  function loop(){
+    requestAnimationFrame(loop);clk+=.016;
+    curP+=(tgtP-curP)*0.045;           // ease the avatar toward the selected chapter
+    setPos(curP);
+    rotX+=(targetRotX-rotX)*.09; rotY+=(targetRotY-rotY)*.09;
+    world.rotation.y=rotY; world.rotation.x=rotX;
+    camDist+=(targetZoom-camDist)*.07; camera.position.set(0,0,camDist);
+    renderer.render(scene,camera);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>
