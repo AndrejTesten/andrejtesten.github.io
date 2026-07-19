@@ -5,6 +5,31 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Andrej Testen</title>
+  <meta name="description" content="Andrej Testen - Software Engineer crafting secure fintech solutions and scalable web applications. Journey, projects, skills and languages." />
+  <meta property="og:title" content="Andrej Testen - Software Engineer" />
+  <meta property="og:description" content="Fintech-focused software engineer. Explore my journey, projects, skills and languages." />
+  <meta property="og:type" content="website" />
+  <!-- Uses the hero photo as a stand-in preview image for link shares (LinkedIn/Slack/etc).
+       A dedicated page screenshot would look sharper here if you want to swap it in later. -->
+  <meta property="og:image" content="me.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%91%E2%80%8D%F0%9F%92%BB%3C/text%3E%3C/svg%3E" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Andrej Testen",
+    "jobTitle": "Software Engineer",
+    "worksFor": { "@type": "Organization", "name": "Globus Marine International" },
+    "image": "me.jpg",
+    "sameAs": [
+      "https://github.com/AndrejTesten",
+      "https://www.linkedin.com/in/andrej-testen-93a756283/"
+    ],
+    "knowsLanguage": ["Serbian", "Slovenian", "English", "Croatian", "Bosnian", "Montenegrin"],
+    "alumniOf": { "@type": "CollegeOrUniversity", "name": "Faculty of Information Studies, Novo Mesto" }
+  }
+  </script>
   <style>
     :root {
       --bg: #05060f;
@@ -19,7 +44,9 @@
       --glow: 0 10px 40px rgba(110, 168, 255, .18);
     }
 
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box
     }
 
@@ -259,11 +286,25 @@
       }
     }
 
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: var(--card);
+      border: 1px solid var(--card-br);
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 600;
+      margin-bottom: 18px
+    }
+
     .hi {
       color: var(--accent);
       font-weight: 600;
       letter-spacing: 1px;
-      margin-bottom: 8px
+      margin-bottom: 18px
     }
 
     .hero h1 {
@@ -282,6 +323,7 @@
     }
 
     .hero p {
+      margin: 0;
       font-size: 1.2rem;
       color: var(--muted);
       line-height: 1.7;
@@ -292,11 +334,12 @@
       margin-top: 34px;
       display: flex;
       gap: 14px;
-      flex-wrap: wrap
+      flex-wrap: nowrap
     }
 
     .btn {
       padding: 13px 26px;
+      white-space: nowrap;
       border-radius: 40px;
       font-weight: 700;
       font-size: .95rem;
@@ -406,18 +449,45 @@
       top: 10px;
       bottom: 10px;
       width: 2px;
-      background: linear-gradient(var(--accent), var(--accent2))
+      border-radius: 2px;
+      background: rgba(255, 255, 255, .10);
+      z-index: 0
+    }
+
+    /* Fills upward from the top to whichever chapter is active - a JS-driven
+       height, eased smoothly so switching chapters feels fluid rather than a snap. */
+    .timeline-progress {
+      position: absolute;
+      left: 9px;
+      top: 10px;
+      width: 2px;
+      height: 0;
+      border-radius: 2px;
+      background: linear-gradient(var(--accent), var(--accent2));
+      box-shadow: 0 0 12px rgba(196, 123, 255, .45);
+      transition: height .55s cubic-bezier(.4, 0, .2, 1);
+      z-index: 1
+    }
+
+    /* Suppresses transitions during a JS geometry-measurement pass (see
+       calibrateTimelinePositions) so collapsing an item to measure its resting height
+       doesn't itself animate - which would make the measurement race the animation. */
+    .timeline.calibrating,
+    .timeline.calibrating .tl-item,
+    .timeline.calibrating .tl-desc {
+      transition: none !important
     }
 
     .tl-item {
       position: relative;
+      z-index: 2;
       margin-bottom: 20px;
       cursor: pointer;
-      transition: transform .18s
+      transition: transform .3s cubic-bezier(.2, .8, .2, 1)
     }
 
     .tl-item:hover {
-      transform: translateX(4px)
+      transform: translateX(6px)
     }
 
     .tl-item::before {
@@ -431,13 +501,26 @@
       background: var(--bg2);
       border: 3px solid var(--accent);
       box-shadow: 0 0 0 4px rgba(110, 168, 255, .10);
-      transition: .2s
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), background .3s ease, border-color .3s ease, box-shadow .3s ease
+    }
+
+    .tl-item:hover::before {
+      /* .tl-item itself slides +6px on hover (see .tl-item:hover above) - translateX(-6px)
+         here cancels that so the dot stays put in place while it grows, instead of sliding
+         along with the row. Keep these two 6px values in sync if either one changes. */
+      transform: translateX(-6px) scale(1.15);
+      box-shadow: 0 0 0 6px rgba(110, 168, 255, .16)
     }
 
     .tl-item.active::before {
       background: var(--accent2);
       border-color: var(--accent2);
       box-shadow: 0 0 0 6px rgba(196, 123, 255, .22)
+    }
+
+    .tl-item.active:hover::before {
+      transform: translateX(-6px) scale(1.15);
+      box-shadow: 0 0 0 8px rgba(196, 123, 255, .26)
     }
 
     .tl-emoji {
@@ -467,7 +550,7 @@
       max-height: 0;
       overflow: hidden;
       opacity: 0;
-      transition: .34s
+      transition: max-height .45s cubic-bezier(.4, 0, .2, 1), opacity .35s ease, margin-top .45s cubic-bezier(.4, 0, .2, 1)
     }
 
     .tl-item.active .tl-desc {
@@ -643,6 +726,92 @@
       border-color: var(--accent2);
       color: var(--accent2);
       transform: translateY(-2px)
+    }
+
+    /* languages */
+    .flag-ico {
+      width: 20px;
+      height: 15px;
+      object-fit: cover;
+      border-radius: 3px;
+      vertical-align: -2px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, .12);
+      background: #0000
+    }
+
+    .lang-note {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--card-br);
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.6
+    }
+
+    .lang-note b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    /* contact */
+    .contact-card {
+      max-width: 880px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--card-br);
+      border-radius: 24px;
+      padding: 40px clamp(20px, 5vw, 44px);
+      box-shadow: var(--glow)
+    }
+
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid var(--card-br);
+      transition: .2s;
+      min-width: 200px;
+      flex: 1 1 200px
+    }
+
+    .contact-link:hover {
+      border-color: var(--accent);
+      background: rgba(110, 168, 255, .07);
+      transform: translateY(-3px)
+    }
+
+    .contact-link .ci {
+      font-size: 1.5rem;
+      flex: 0 0 auto
+    }
+
+    .contact-link .cl {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .contact-link .cl b {
+      font-size: .95rem;
+      white-space: nowrap
+    }
+
+    .contact-link .cl span {
+      font-size: .78rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
     }
 
     /* certificates */
@@ -900,6 +1069,50 @@
       padding: 4px 10px
     }
 
+    .pc-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px
+    }
+
+    .pc-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid var(--card-br);
+      border-radius: 20px;
+      padding: 7px 14px;
+      transition: .2s
+    }
+
+    a.pc-link:hover {
+      border-color: var(--accent);
+      background: rgba(110, 168, 255, .10);
+      color: var(--accent);
+      transform: translateY(-2px)
+    }
+
+    .pc-link.disabled {
+      color: var(--muted);
+      cursor: not-allowed;
+      opacity: .7
+    }
+
+    .pc-link.disabled em {
+      font-style: normal;
+      font-size: .68rem;
+      color: var(--accent3);
+      background: rgba(62, 242, 196, .12);
+      border-radius: 10px;
+      padding: 2px 7px;
+      margin-left: 2px
+    }
+
     .project-card.ghost {
       cursor: default;
       border-style: dashed;
@@ -916,47 +1129,51 @@
       aspect-ratio: 16/7
     }
 
-    /* lightbox */
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: none;
-      place-items: center;
-      padding: 24px;
-      background: rgba(4, 6, 14, .86);
-      backdrop-filter: blur(8px)
-    }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: rgba(4, 6, 14, .86);
+  backdrop-filter: blur(8px);
+}
 
-    .lightbox.open {
-      display: grid
-    }
+.lightbox.open {
+  display: grid;
+}
 
-    .lb-inner {
-      width: min(920px, 94vw);
-      max-height: 92vh;
-      display: flex;
-      flex-direction: column;
-      gap: 14px
-    }
+.lb-inner {
+  width: auto;
+  max-width: 95vw;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-    .lb-stage {
-      position: relative;
-      background: #0a0f22;
-      border: 1px solid var(--card-br);
-      border-radius: 16px;
-      overflow: hidden;
-      aspect-ratio: 16/10;
-      display: grid;
-      place-items: center
-    }
+.lb-stage {
+  position: relative;
+  background: #0a0f22;
+  border: 1px solid var(--card-br);
+  border-radius: 16px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  max-width: 95vw;
+  max-height: 85vh;
+}
 
-    .lb-stage img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: #0a0f22
-    }
+.lb-stage img {
+  display: block;
+  max-width: 95vw;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
 
     .lb-stage .pc-ph {
       display: block;
@@ -1071,6 +1288,45 @@
       line-height: 1.6
     }
 
+    .latest-post {
+      max-width: 480px;
+      margin: 0 auto 28px;
+      text-align: left;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid var(--card-br);
+      border-radius: 16px;
+      padding: 20px 22px;
+      transition: .2s;
+      display: block
+    }
+
+    .latest-post:hover {
+      border-color: var(--accent);
+      background: rgba(110, 168, 255, .06);
+      text-decoration: none
+    }
+
+    .latest-post .lp-label {
+      font-size: .72rem;
+      color: var(--accent3);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase
+    }
+
+    .latest-post h4 {
+      margin: 6px 0 6px;
+      font-size: 1.05rem;
+      color: var(--ink)
+    }
+
+    .latest-post p {
+      margin: 0;
+      font-size: .88rem;
+      color: var(--muted);
+      max-width: none
+    }
+
     footer {
       position: relative;
       z-index: 2;
@@ -1114,6 +1370,24 @@
 
       .hero-grid {
         gap: 26px
+      }
+
+      /* Keep both CTA buttons on one row instead of stacking - they shrink to fit
+         rather than wrap, with ellipsis as a last resort on very narrow phones.
+         Scoped to .cta .btn only, so other buttons on the page (blog CTA, lightbox
+         "Live" link, etc.) keep their normal size. */
+      .cta {
+        gap: 8px
+      }
+
+      .cta .btn {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 12px 14px;
+        font-size: .82rem;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis
       }
 
       .journey-wrap {
@@ -1165,6 +1439,11 @@
         padding: 12px 20px;
         font-size: .9rem
       }
+
+      .cta .btn {
+        padding: 10px 10px;
+        font-size: .74rem
+      }
     }
 
     .reveal {
@@ -1192,6 +1471,7 @@
       <a href="#projects">Projects</a>
       <a href="#certs">Certificates</a>
       <a href="#interests">Interests</a>
+      <a href="#contact">Contact</a>
       <a class="blog" href="#" target="_blank" rel="noopener">Blog ↗</a>
     </div>
   </nav>
@@ -1202,10 +1482,11 @@
       <div class="hero-inner reveal">
         <div class="hi"> Hi, I'm</div>
         <h1><span class="grad">Andrej Testen</span></h1>
-        <p>SOFTWARE ENGINEER - crafting secure fintech solutions and scalable web applications. Born in Belgrade, now
+        <div class="role-badge" id="roleBadge">Software Engineer · Globus Marine International</div>
+        <p>Crafting secure fintech solutions and scalable web applications. Born in Belgrade, now
           creating things in Ljubljana.</p>
         <div class="cta">
-          <a class="btn primary" href="#journey">Explore my journey 🌍</a>
+          <a class="btn primary" href="#journey">Explore my journey </a>
           <a class="btn ghost" href="#" target="_blank" rel="noopener" data-blog>Read my blog ↗</a>
         </div>
       </div>
@@ -1213,7 +1494,7 @@
         <!-- Put a photo named me.jpg next to index.html (or change the src below). -->
         <img id="me-photo" src="me.jpg" alt="Andrej Testen"
           onerror="this.closest('.hero-photo').classList.add('noimg');this.style.display='none'">
-        <span class="photo-fallback">📷<br><small>add <b>me.jpg</b> here</small></span>
+        <span class="photo-fallback">📷</span>
       </div>
     </div>
     <div class="scroll-hint">SCROLL ↓</div>
@@ -1224,13 +1505,13 @@
     <div class="reveal">
       <div class="eyebrow">My path across the map</div>
       <h2 class="title">The Journey </h2>
-      <p class="sub">Choose a chapter on the timeline to follow my journey across the globe. Drag to rotate, and scroll
+      <p class="sub">Choose a chapter on the timeline to fly across the map. Drag to pan, scroll
         to zoom.</p>
     </div>
     <div class="journey-wrap">
 <div id="globe-holder">
   <div id="map"></div>
-</div>      <div class="timeline reveal" id="timeline"></div>
+</div>      <div class="timeline reveal" id="timeline"><div class="timeline-progress" id="timelineProgress"></div></div>
     </div>
   </section>
 
@@ -1239,9 +1520,9 @@
     <div class="reveal">
       <div class="eyebrow">What I bring</div>
       <h2 class="title">Skills </h2>
-      <p class="sub">The technical toolbox and the human side — both matter.</p>
+      <p class="sub">The technical toolbox and the human side - both matter.</p>
     </div>
-    <div class="grid cards-2">
+    <div class="grid cards-3">
       <div class="card reveal">
         <h3><span class="ico">⚙️</span> Hard Skills</h3>
         <div id="hardskills"></div>
@@ -1249,6 +1530,11 @@
       <div class="card reveal">
         <h3><span class="ico">💬</span> Soft Skills</h3>
         <div class="chips" id="softskills"></div>
+      </div>
+      <div class="card reveal">
+        <h3><span class="ico">🗣️</span> Languages</h3>
+        <div id="languages"></div>
+        <div class="lang-note" id="langNote"></div>
       </div>
     </div>
   </section>
@@ -1283,29 +1569,45 @@
     <div class="interests" id="hobbylist"></div>
   </section>
 
+  <!-- ================= CONTACT ================= -->
+  <section id="contact">
+    <div class="reveal" style="text-align:center">
+      <div class="eyebrow">Let's connect</div>
+      <h2 class="title">Get In Touch</h2>
+      <p class="sub" style="margin-left:auto;margin-right:auto">Open to new opportunities, collaborations, or just a
+        good conversation about fintech and code.</p>
+    </div>
+    <div class="contact-card reveal">
+      <div class="contact-links" id="contactLinks"></div>
+    </div>
+  </section>
+
   <!-- ================= BLOG CTA ================= -->
   <section id="blog">
     <div class="blog-cta reveal">
       <h2>I write things too </h2>
       <p>Thoughts on tech, learning, and the journey from Belgrade to Ljubljana. Come say hi on my blog.</p>
+      <div id="latestPost"></div>
       <a class="btn primary" href="#" target="_blank" rel="noopener" data-blog>Visit my blog ↗</a>
     </div>
   </section>
 
   <footer>
-    Built with Three.js · © <span id="year"></span> Andrej Testen · <a href="#" data-blog target="_blank"
+    Handcrafted with MapLibre GL · © <span id="year"></span> Andrej Testen · <a href="#" data-blog target="_blank"
       rel="noopener">Blog</a>
   </footer>
 
-<link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet" />
+<!-- Pinned to an exact version (5.24.0) rather than @latest - an unpinned CDN import can
+     silently break the page on a future upstream release. -->
+<link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet" />
 
-<script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>  <script>
+<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>  <script>
     /* =========================================================
        0. EDIT YOUR CONTENT HERE
        ========================================================= */
-    const BLOG_URL = "#"; // <-- put your blog link here
+    const BLOG_URL = "blog/index.html";
 
-    // Each stop is a chapter of the journey. Click one and the little avatar travels there — and grows up.
+    // Each stop is a chapter of the journey. Click one and the little avatar travels there - and grows up.
     const STOPS = [
       {
         year: "Born & Raised", title: "Belgrade", place: "Serbia",
@@ -1318,21 +1620,21 @@
         lat: 45.8010, lon: 15.1710
       },
       {
-        year: "June 2024 — Present", title: "Ljubljana", place: "Slovenia",
-        desc: "Working at Globus Marine International in Ljubljana since June 2024 — present.",
+        year: "June 2024 - Present", title: "Ljubljana", place: "Slovenia",
+        desc: "Working at Globus Marine International in Ljubljana since June 2024 - present.",
         lat: 46.0569, lon: 14.5058
       },
     ];
 
     const HARD_SKILLS = [
-      { name: "TypeScript", level: 95 },
-      { name: "React", level: 90 },
-      { name: "Angular", level: 85 },
-      { name: "ASP.NET Core", level: 85 },
+      { name: "TypeScript", level: 90 },
+      { name: "React", level: 75 },
+      { name: "Angular", level: 90 },
+      { name: "ASP.NET Core", level: 80 },
       { name: "SQL", level: 90 },
-      { name: "Payments & PSD2", level: 90 },
-      { name: "DORA Compliance", level: 80 },
-      { name: "Open Banking APIs", level: 80 },
+      { name: "Payments & PSD2", level: 75 },
+      { name: "DORA Compliance", level: 75 },
+      { name: "Open Banking APIs", level: 75 },
     ];
 
     const SOFT_SKILLS = [
@@ -1345,6 +1647,22 @@
       "Attention to Detail",
       "Continuous Learning",
     ];
+
+    // Country codes for flagcdn.com - emoji flags (🇷🇸 etc.) don't render as flags on
+    // Windows in any browser, so real flag images are used instead for consistent display.
+    const LANGUAGES = [
+      { lang: "Serbian", cc: "rs", level: "Native", pct: 100 },
+      { lang: "Slovenian", cc: "si", level: "Fluent", pct: 92 },
+      { lang: "English", cc: "gb", level: "Fluent", pct: 92 },
+    ];
+    // Serbian, Croatian, Bosnian and Montenegrin form one mutually intelligible
+    // language continuum, so native Serbian fluency carries straight over.
+    const LANG_NOTE_EXTRA = [
+      { name: "Croatian", cc: "hr" },
+      { name: "Bosnian", cc: "ba" },
+      { name: "Montenegrin", cc: "me" },
+    ];
+    const flagImg = (cc, name) => `<img class="flag-ico" src="https://flagcdn.com/w40/${cc}.png" srcset="https://flagcdn.com/w80/${cc}.png 2x" alt="${name} flag" width="20" height="15" loading="lazy">`;
 
     const CERTIFICATES = [
       {
@@ -1390,42 +1708,132 @@
       },
     ];
 
-    // PROJECTS — add your own. `shots` are screenshot paths (e.g. "projects/app-1.jpg");
-    // missing images fall back to a placeholder, so you can fill them in anytime.
+    // PROJECTS - each has its own screenshot folder under projects/<slug>/ - drop images
+    // named 1.jpg, 2.jpg, 3.jpg (matching the `shots` list) into the matching folder and
+    // they'll appear automatically; missing images fall back to a placeholder icon.
+    // `url` currently points at your GitHub profile as a placeholder - swap in the exact
+    // repo (or a live demo) per project once you have one to link.
+    const GH_PROFILE = "https://github.com/AndrejTesten";
     const PROJECTS = [
       {
         title: "Payment Ledger Platform", tag: "Fintech · Backend", domain: "ledger.internal",
         desc: "A production-grade double-entry ledger and payment-processing platform engineered for financial accuracy, full auditability, and reliable high-volume transaction handling.",
-        tech: ["Double-Entry", "Payments", "Fintech"], url: "#", ph: "💳",
-        shots: ["projects/ledger-1.jpg", "projects/ledger-2.jpg", "projects/ledger-3.jpg"]
+        tech: ["Double-Entry", "Payments", "Fintech"], url: GH_PROFILE, ph: "💳",
+        shots: ["projects/payment-ledger/1.jpg", "projects/payment-ledger/2.jpg", "projects/payment-ledger/3.jpg"]
       },
       {
         title: "Hospital Management System", tag: "Full-Stack · Healthcare", domain: "hospital.app",
-        desc: "An end-to-end hospital management system with three dedicated modules — Doctor, Patient, and Admin — built from scratch as my final bachelor's degree project.",
-        tech: ["C#", ".NET Core", "ABP Framework", "Angular", "MySQL"], url: "#", ph: "🏥",
-        shots: ["projects/hospital-1.jpg", "projects/hospital-2.jpg", "projects/hospital-3.jpg"]
+        desc: "An end-to-end hospital management system with three dedicated modules - Doctor, Patient, and Admin - built from scratch as my final bachelor's degree project.",
+        tech: ["C#", ".NET Core", "ABP Framework", "Angular", "MySQL"], url: GH_PROFILE, ph: "🏥",
+        shots: ["projects/hospital-system/1.jpeg", "projects/hospital-system/2.jpeg", "projects/hospital-system/3.jpeg", "projects/hospital-system/4.jpeg", "projects/hospital-system/5.jpeg"]
       },
       {
         title: "Couplify", tag: "Mobile · Social", domain: "couplify.app",
         desc: "A cross-platform mobile app that helps couples stay close and share meaningful moments together, even when they're far apart.",
-        tech: ["React Native", "Expo", "Supabase"], url: "#", ph: "💞",
-        shots: ["projects/couplify-1.jpg", "projects/couplify-2.jpg"]
+        tech: ["React Native", "Expo", "Supabase"], url: GH_PROFILE, ph: "💞",
+        shots: ["projects/couplify/1.jpeg", "projects/couplify/2.jpeg", "projects/couplify/3.jpeg", "projects/couplify/4.jpeg", "projects/couplify/5.jpeg", "projects/couplify/6.jpeg", "projects/couplify/7.jpeg", "projects/couplify/8.jpeg"],
+        links: [
+          { label: "🍎 App Store", note: "Coming soon", disabled: true },
+          { label: "▶ Google Play", note: "Coming soon", disabled: true },
+        ]
       },
       {
         title: "PaperMotion", tag: "AI · Creative", domain: "papermotion.app",
-        desc: "Turns your photos and a prompt into a short AI-generated clip, then lays it out as a printable PDF you fold into a flipbook — the frames animate as you riffle the pages.",
-        tech: ["Next.js", "AI Video", "PDF"], url: "#", ph: "🎞️",
-        shots: ["projects/papermotion-1.jpg", "projects/papermotion-2.jpg"]
+        desc: "Turns your photos and a prompt into a short AI-generated clip, then lays it out as a printable PDF you fold into a flipbook - the frames animate as you riffle the pages.",
+        tech: ["Next.js", "AI Video", "PDF"], url: GH_PROFILE, ph: "🎞️",
+        shots: ["projects/papermotion/1.jpg", "projects/papermotion/2.jpg"],
+        // TODO: this app isn't deployed anywhere yet (it's a Next.js app with server-side
+        // API routes, so it needs real hosting - e.g. Vercel - not just static files).
+        // Swap "#" for the live URL once it's deployed.
+        links: [
+          { label: "🎬 Live Demo", href: "#" },
+        ]
       },
+    ];
+
+    // CONTACT - Resume auto-hides below if cv.pdf isn't present next to index.html (see the
+    // fetch check near the bottom of this script); drop a cv.pdf here to make it appear.
+    const CONTACT = [
+      { icon: "✉️", label: "Email", value: "andrej.testen33@gmail.com", href: "mailto:andrej.testen33@gmail.com" },
+      { icon: "💼", label: "LinkedIn", value: "andrej-testen", href: "https://www.linkedin.com/in/andrej-testen-93a756283/" },
+      { icon: "🐙", label: "GitHub", value: "@AndrejTesten", href: "https://github.com/AndrejTesten" },
+      { icon: "📄", label: "Resume", value: "Download CV", href: "cv.pdf" },
     ];
 
     /* =========================================================
        1. RENDER CONTENT
        ========================================================= */
     document.getElementById('year').textContent = new Date().getFullYear();
-    document.querySelectorAll('[data-blog], .navlinks .blog').forEach(a => { if (BLOG_URL && BLOG_URL !== "#") a.href = BLOG_URL; });
+    // Auto-computed tenure at Globus Marine International - stays accurate on its own
+    // (like the footer year above) instead of needing a manual edit every few months.
+    (function () {
+      const start = new Date(2024, 5, 1); // June 2024
+      const now = new Date();
+      let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+      if (now.getDate() < start.getDate()) months--;
+      months = Math.max(0, months);
+      const yrs = Math.floor(months / 12), mo = months % 12;
+      const parts = [];
+      if (yrs) parts.push(yrs + (yrs === 1 ? ' yr' : ' yrs'));
+      if (mo || !yrs) parts.push(mo + (mo === 1 ? ' mo' : ' mos'));
+      const badge = document.getElementById('roleBadge');
+      if (badge) badge.textContent += ' · ' + parts.join(' ');
+    })();
+    // No dead "#" links: hide the blog nav item + CTA section entirely until a real BLOG_URL is set.
+    if (BLOG_URL && BLOG_URL !== "#") {
+      document.querySelectorAll('[data-blog], .navlinks .blog').forEach(a => a.href = BLOG_URL);
+    } else {
+      document.querySelectorAll('[data-blog], .navlinks .blog').forEach(a => a.style.display = 'none');
+      const blogSection = document.getElementById('blog');
+      if (blogSection) blogSection.style.display = 'none';
+    }
+    // Latest-post preview on the blog CTA. Reads blog/posts.json - needs the page served
+    // over http(s) (fetch is blocked from a plain file:// page by browser security), so this
+    // silently does nothing when just double-clicking index.html locally. Works once deployed.
+    if (BLOG_URL && BLOG_URL !== "#") {
+      fetch('blog/posts.json').then(r => r.json()).then(posts => {
+        if (!posts.length) return;
+        const latest = posts.slice().sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        const el = document.getElementById('latestPost');
+        if (!el) return;
+        const a = document.createElement('a');
+        a.className = 'latest-post';
+        a.href = `blog/posts/${latest.slug}.html`;
+        a.innerHTML = `<div class="lp-label">Latest post</div><h4>${latest.title}</h4><p>${latest.excerpt}</p>`;
+        el.appendChild(a);
+      }).catch(() => { /* no posts.json reachable yet - CTA button still works */ });
+    }
 
     const tl = document.getElementById('timeline');
+    // Fills the track from the top down to the active chapter's dot - height is animated
+    // by the CSS transition on .timeline-progress, so switching chapters glides smoothly.
+    //
+    // Target heights are calibrated once (collapsedOffsetTops), NOT read live off the DOM
+    // at click time. Reason: clicking a chapter also collapses whichever chapter was
+    // previously active. If that previous chapter sits ABOVE the new one, its description
+    // shrinks over .45s and shifts everything below it (including the new dot) upward -
+    // but a live offsetTop read happens synchronously at t=0, before any of that shift has
+    // happened, so it captures a stale, too-tall value and the fill overshoots past the dot.
+    // (Going the other direction - collapsing a chapter BELOW the new one - never moves the
+    // new dot at all, which is why only one direction looked broken.) Using each chapter's
+    // pre-measured *collapsed* resting position sidesteps the race entirely.
+    let collapsedOffsetTops = [];
+    function calibrateTimelinePositions() {
+      const items = [...tl.querySelectorAll('.tl-item')].filter(el => !el.classList.contains('tl-future'));
+      const wasActive = tl.querySelector('.tl-item.active');
+      tl.classList.add('calibrating');       // kill transitions for this measurement pass
+      items.forEach(el => el.classList.remove('active'));
+      void tl.offsetHeight;                  // force layout to apply instantly, no animation
+      collapsedOffsetTops = items.map(el => el.offsetTop);
+      if (wasActive) wasActive.classList.add('active');
+      void tl.offsetHeight;                  // apply the restore instantly too, before re-enabling
+      tl.classList.remove('calibrating');
+    }
+    function updateTimelineProgress(i) {
+      const prog = document.getElementById('timelineProgress');
+      if (!prog || collapsedOffsetTops[i] == null) return;
+      prog.style.height = Math.max(0, collapsedOffsetTops[i] + 4) + 'px';
+    }
     STOPS.forEach((s, i) => {
       const d = document.createElement('div');
       d.className = 'tl-item' + (i === 0 ? ' active' : ''); d.dataset.i = i;
@@ -1440,6 +1848,7 @@
         .forEach(item => item.classList.remove('active'));
 
     d.classList.add('active');
+    updateTimelineProgress(i);
 
     // move map
     goTo(
@@ -1456,8 +1865,20 @@
     future.innerHTML = `
   <div class="tl-year">Next chapter</div>
   <div class="tl-title">Loading<span class="dots"><i>.</i><i>.</i><i>.</i></span></div>
-  <div class="tl-desc">Buffering the future — new adventures ahead.</div>`;
+  <div class="tl-desc">Buffering the future - new adventures ahead.</div>`;
     tl.appendChild(future);
+    calibrateTimelinePositions();
+    updateTimelineProgress(0);
+    // Re-calibrate on resize (text can reflow to a different number of lines at other
+    // widths, which changes each chapter's collapsed height) and re-apply to whichever
+    // chapter is currently active.
+    addEventListener('resize', () => {
+      const activeIdx = [...tl.querySelectorAll('.tl-item')]
+        .filter(el => !el.classList.contains('tl-future'))
+        .findIndex(el => el.classList.contains('active'));
+      calibrateTimelinePositions();
+      if (activeIdx >= 0) updateTimelineProgress(activeIdx);
+    });
 
     const hs = document.getElementById('hardskills');
     HARD_SKILLS.forEach(s => {
@@ -1469,6 +1890,17 @@
 
     const ss = document.getElementById('softskills');
     SOFT_SKILLS.forEach(s => { const c = document.createElement('span'); c.className = 'chip'; c.textContent = s; ss.appendChild(c); });
+
+    const lgs = document.getElementById('languages');
+    LANGUAGES.forEach(l => {
+      const el = document.createElement('div'); el.className = 'skill';
+      el.innerHTML = `<div class="skill-top"><b>${flagImg(l.cc, l.lang)} ${l.lang}</b><span>${l.level}</span></div>
+    <div class="bar"><i data-w="${l.pct}"></i></div>`;
+      lgs.appendChild(el);
+    });
+    document.getElementById('langNote').innerHTML = 'Also understood at a native level: '
+      + LANG_NOTE_EXTRA.map(x => `${flagImg(x.cc, x.name)} <b>${x.name}</b>`).join(' · ')
+      + ' - mutually intelligible with Serbian.';
 
     const cl = document.getElementById('certlist');
     CERTIFICATES.forEach(c => {
@@ -1485,8 +1917,23 @@
       hl.appendChild(el);
     });
 
+    const cLinks = document.getElementById('contactLinks');
+    CONTACT.forEach(c => {
+      const a = document.createElement('a'); a.className = 'contact-link'; a.href = c.href;
+      if (c.href.endsWith('.pdf')) a.classList.add('resume-link'); // hidden below until cv.pdf actually exists
+      if (c.href !== '#' && !c.href.startsWith('mailto:')) { a.target = '_blank'; a.rel = 'noopener'; }
+      a.innerHTML = `<span class="ci">${c.icon}</span><span class="cl"><b>${c.label}</b><span>${c.value}</span></span>`;
+      cLinks.appendChild(a);
+    });
+    // No dead resume button: hide it until a real cv.pdf is dropped next to index.html.
+    // Note: on some browsers a plain file:// page blocks this HEAD check by policy, so the
+    // button may stay hidden locally even after adding the PDF - it'll resolve correctly
+    // once the site is served over http(s) (e.g. Netlify/GitHub Pages).
+    fetch('cv.pdf', { method: 'HEAD' }).then(r => { if (!r.ok) throw 0; })
+      .catch(() => document.querySelectorAll('.resume-link').forEach(a => a.style.display = 'none'));
+
     /* =========================================================
-       1b. PROJECTS — cards, 3D tilt, screenshot lightbox
+       1b. PROJECTS - cards, 3D tilt, screenshot lightbox
        ========================================================= */
     (function () {
       const grid = document.getElementById('projectGrid');
@@ -1554,9 +2001,15 @@
         <h3>${p.title}</h3>
         <p>${p.desc}</p>
         <div class="pc-tech">${p.tech.map(t => `<span>${t}</span>`).join('')}</div>
+        ${p.links ? `<div class="pc-links">${p.links.map(l => l.disabled
+          ? `<span class="pc-link disabled">${l.label}<em>${l.note || 'Soon'}</em></span>`
+          : `<a class="pc-link" href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`
+        ).join('')}</div>` : ''}
       </div>`;
         const shot = card.querySelector('.pc-shot'), img = card.querySelector('.pc-shot img');
         img.onerror = () => shot.classList.add('noimg');
+        // link/badge buttons are their own action - don't also trigger the card's lightbox
+        card.querySelectorAll('.pc-link').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
         card.addEventListener('click', () => openLB(p));
         // 3D tilt on hover (parallax)
         card.addEventListener('mousemove', e => {
@@ -1577,7 +2030,7 @@
     <div class="pc-body">
       <span class="pc-tag">In progress</span>
       <h3>More on the way<span class="dots"><i>.</i><i>.</i><i>.</i></span></h3>
-      <p>Constantly building new projects — check back soon.</p>
+      <p>Constantly building new projects - check back soon.</p>
     </div>`;
       grid.appendChild(ghost);
     })();
@@ -1645,6 +2098,15 @@ const map = new maplibregl.Map({
     bearing: 0
 });
 
+// The container uses CSS aspect-ratio, which can resolve its final size *after*
+// MapLibre measures it - that leaves the canvas stuck at the library's 400x300
+// fallback while the container is really ~520x520 (breaks drag/zoom outside that
+// corner). A ResizeObserver keeps the canvas synced to the container at all times.
+const globeHolderEl = document.getElementById('globe-holder');
+if (globeHolderEl && 'ResizeObserver' in window) {
+    new ResizeObserver(() => map.resize()).observe(globeHolderEl);
+}
+requestAnimationFrame(() => map.resize());
 
 map.on("load", () => {
 
